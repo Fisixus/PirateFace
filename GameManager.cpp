@@ -14,18 +14,10 @@ color4 colors[NumVertices];
 GLuint ww = 500;
 GLuint wh = 500;
 
-point4 PirateFace[NumVertices] = {
-	point4(0.0, 0.0 ,0.0, 1.0) //a0
+GLuint vao;
 
-	/*
-
-		point4(0.0, 0.0 ,0.0, 1.0), //a0
-		point4(0.0, 0.4 ,0.0, 1.0), //a1
-		point4(0.1, 0.4 ,0.0, 1.0), //a2
-		point4(0.1, 0.1 ,0.0, 1.0), //a3
-		point4(0.2, 0.1 ,0.0, 1.0), //a4
-		point4(0.2, 0.0 ,0.0, 1.0), //a5
-		*/
+point4 PirateFace[30] = {
+	point4(0.0, 0.0 ,0.0, 1.0)
 };
 
 point4 centerPoint = point4(0.0, 0.0, 0.0, 1.0);
@@ -46,11 +38,11 @@ GLuint  theta;  // The location of the "theta" shader uniform variable
 //----------------------------------------------------------------------------
 
 int Index = 0;
-void quad(int a, int b, int c)
+void triangle(int a, int b)
 {
 	colors[Index] = vertex_colors[2]; points[Index] = PirateFace[a]; Index++;
+	colors[Index] = vertex_colors[2]; points[Index] = centerPoint; Index++;
 	colors[Index] = vertex_colors[2]; points[Index] = PirateFace[b]; Index++;
-	colors[Index] = vertex_colors[2]; points[Index] = PirateFace[c]; Index++;
 }
 
 //----------------------------------------------------------------------------
@@ -58,13 +50,19 @@ void quad(int a, int b, int c)
 void fillPointsandColors()
 {
 	GLfloat angle;
+	for(int i=0;i<=30; i++)
+	{
+		angle = 2 * PI * (i+1) / 30;
+		PirateFace[i].x = centerPoint.x + cos(angle) * radius;
+		PirateFace[i].y = centerPoint.y + sin(angle) * radius;	
+		PirateFace[i].z = 2.0; 
+		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
+		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
+	}
+
 	for(int i=0;i<30;i++)
 	{
-		angle = 2 * PI * i / 30;
-		PirateFace[i].x = (centerPoint.x + cos(angle)) * radius;
-		PirateFace[i].y = (centerPoint.y + sin(angle)) * radius;
-		quad(0, i + 1, i + 2);
-		//printf("Pressing left, respectively. %f\n", PirateFace[i].x);
+		triangle(i, i + 1);
 	}
 /*
 	quad(1, 0, 3, 2);
@@ -84,7 +82,7 @@ void init()
 
 	//printf("Pressing left, respectively.\n");;
 	// Create a vertex array object
-	GLuint vao;
+	
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -115,7 +113,7 @@ void init()
 	theta = glGetUniformLocation(program, "theta");
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.0, 0.0, 0.0, 1.0);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 }
 
 //----------------------------------------------------------------------------
@@ -123,9 +121,9 @@ void init()
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	glBindVertexArray(vao);
 	glUniform3fv(theta, 1, Theta);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, NumVertices);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
 	glutSwapBuffers();
 }
@@ -156,6 +154,24 @@ void mouse(int button, int state, int x, int y)
 }
 
 //----------------------------------------------------------------------------
+void reshapeFunc(GLsizei w, GLsizei h)
+{
+	/* adjust clipping box */
+
+
+	/* adjust viewport and clear */
+
+	glViewport(0, 0, ww*h / wh, h);
+
+	/* set global size for use by drawing routine */
+
+	//ww = w;
+	//wh = h;
+	//resetGame();
+	glutPostRedisplay();
+}
+
+//----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -179,7 +195,7 @@ int main(int argc, char **argv)
 	glewInit();
 
 	init();
-
+	glutReshapeFunc(reshapeFunc);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
