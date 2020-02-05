@@ -6,14 +6,17 @@ typedef Angel::vec4  point4;
 
 #define PI 3.14159265
 
-//First 60 for face
+//First 1000 for face
 //Second 6 for headband
-//Third 18 for smile
-const int NumVertices = 84;
-GLfloat faceRadius = 0.4;
+//Third 16 for smile
+//Fourth 60 for left eye
+//Fifth 90 for right eye
+//Sixth 6 for eye band
+const int NumVertices = 1178;
 
+GLfloat faceRadius = 0.4;
 GLfloat smileRadius = 0.3;
-GLfloat eyeRadius = 0.1;
+GLfloat eyeRadius = 0.05;
 
 point4 points[NumVertices];
 color4 colors[NumVertices];
@@ -23,15 +26,15 @@ GLuint wh = 500;
 
 GLuint vao;
 
-//0-30 for face, 31-34 for headband, 35-43 for smile
-point4 PirateFace[45] = {
+//0-500 for face, 501-504 for headband, 505-513 for smile, 514-544 for left eye, 545-575 for right eye, 576-579 for eye band
+point4 PirateFace[580] = {
 	point4(0.0, 0.0 ,0.0, 1.0)
 };
 
 point4 faceCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
 point4 smileCenterPoint = point4(0.0, 0.1, 0.0, 1.0);
-//point4 leftEyeCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
-//point4 rightEyeCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
+point4 leftEyeCenterPoint = point4(-0.15, 0.1, 0.0, 1.0);
+point4 rightEyeCenterPoint = point4(0.15, 0.1, 0.0, 1.0);
 
 // RGBA colors
 color4 vertex_colors[6] = {
@@ -56,6 +59,13 @@ void lines(int a, int b)
 	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[b]; Index++;
 }
 
+void triangle(int a, int b)
+{
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[a]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = rightEyeCenterPoint; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[b]; Index++;
+}
+
 void quad(int a, int b, int c, int d)
 {
 	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[a]; Index++;
@@ -69,19 +79,20 @@ void quad(int a, int b, int c, int d)
 
 void storeFace()
 {
+	int counter = 0;
 	GLfloat angle;
-	for (int i = 0; i <= 30; i++)
+	for (int i = 0; i <= 500; i++)
 	{
-		angle = 2 * PI * (i + 1) / 29;
-		PirateFace[i].x = faceCenterPoint.x + cos(angle) * faceRadius;
-		PirateFace[i].y = faceCenterPoint.y + sin(angle) * faceRadius;
-		PirateFace[i].z = 0.0;
-		PirateFace[i].w = 1.0;
+		angle = 2 * PI * (i + 1) / 499;
+		PirateFace[counter].x = faceCenterPoint.x + cos(angle) * faceRadius;
+		PirateFace[counter].y = faceCenterPoint.y + sin(angle) * faceRadius;
+		PirateFace[counter].z = 0.0;
+		PirateFace[counter++].w = 1.0;
 		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
 		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
 	}
 
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 500; i++)
 	{
 		lines(i, i + 1);
 	}
@@ -90,33 +101,33 @@ void storeFace()
 
 void storeHeadband()
 {
-	PirateFace[31].x = 0.32f;
-	PirateFace[31].y = 0.25f;
-	PirateFace[31].z = 0.0f;
-	PirateFace[31].w = 1.0f;
+	PirateFace[501].x = 0.32f;
+	PirateFace[501].y = 0.25f;
+	PirateFace[501].z = 0.0f;
+	PirateFace[501].w = 1.0f;
 
-	PirateFace[32].x = 0.32f;
-	PirateFace[32].y = 0.27f;
-	PirateFace[32].z = 0.0f;
-	PirateFace[32].w = 1.0f;
+	PirateFace[502].x = 0.32f;
+	PirateFace[502].y = 0.27f;
+	PirateFace[502].z = 0.0f;
+	PirateFace[502].w = 1.0f;
 
-	PirateFace[33].x = -0.32f;
-	PirateFace[33].y = 0.27f;
-	PirateFace[33].z = 0.0f;
-	PirateFace[33].w = 1.0f;
+	PirateFace[503].x = -0.32f;
+	PirateFace[503].y = 0.27f;
+	PirateFace[503].z = 0.0f;
+	PirateFace[503].w = 1.0f;
 
-	PirateFace[34].x = -0.32f;
-	PirateFace[34].y = 0.25f;
-	PirateFace[34].z = 0.0f;
-	PirateFace[34].w = 1.0f;
+	PirateFace[504].x = -0.32f;
+	PirateFace[504].y = 0.25f;
+	PirateFace[504].z = 0.0f;
+	PirateFace[504].w = 1.0f;
 
-	quad(31, 32, 33, 34);
+	quad(501, 502, 503, 504);
 
 }
 
 void storeSmile()
 {
-	int counter = 35;
+	int counter = 505;
 	GLfloat angle;
 	for (int i = 17; i <= 25; i++)
 	{
@@ -129,10 +140,78 @@ void storeSmile()
 		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
 	}
 
-	for (int i = 35; i <= 43; i++)
+	for (int i = 505; i < 513; i++)
 	{
 		lines(i, i + 1);
 	}
+}
+
+void storeLeftEye()
+{
+	int counter = 514;
+	GLfloat angle;
+	for (int i = 0; i <= 30; i++)
+	{
+		angle = 2 * PI * (i + 1) / 29;
+		PirateFace[counter].x = leftEyeCenterPoint.x + cos(angle) * eyeRadius;
+		PirateFace[counter].y = leftEyeCenterPoint.y + sin(angle) * eyeRadius;
+		PirateFace[counter].z = 0.0;
+		PirateFace[counter++].w = 1.0;
+		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
+		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
+	}
+
+	for (int i = 514; i < 544; i++)
+	{
+		lines(i, i + 1);
+	}
+}
+
+void storeRightEye()
+{
+	int counter = 545;
+	GLfloat angle;
+	for (int i = 0; i <= 30; i++)
+	{
+		angle = 2 * PI * (i + 1) / 29;
+		PirateFace[counter].x = rightEyeCenterPoint.x + cos(angle) * eyeRadius;
+		PirateFace[counter].y = rightEyeCenterPoint.y + sin(angle) * eyeRadius;
+		PirateFace[counter].z = 0.0;
+		PirateFace[counter++].w = 1.0;
+		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
+		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
+	}
+
+	for (int i = 545; i < 575; i++)
+	{
+		triangle(i, i + 1);
+	}
+}
+
+void storeEyeBand()
+{
+	//a0
+	PirateFace[576].x = 0.18f;
+	PirateFace[576].y = 0.25f;
+	PirateFace[576].z = 0.0f;
+	PirateFace[576].w = 1.0f;
+	//a1
+	PirateFace[577].x = 0.12f;
+	PirateFace[577].y = 0.25f;
+	PirateFace[577].z = 0.0f;
+	PirateFace[577].w = 1.0f;
+	//a2
+	PirateFace[578].x = 0.12f;
+	PirateFace[578].y = 0.10f;
+	PirateFace[578].z = 0.0f;
+	PirateFace[578].w = 1.0f;
+	//a3
+	PirateFace[579].x = 0.18f;
+	PirateFace[579].y = 0.10f;
+	PirateFace[579].z = 0.0f;
+	PirateFace[579].w = 1.0f;
+
+	quad(576, 577, 578, 579);
 }
 
 void fillPointsandColors()
@@ -140,7 +219,26 @@ void fillPointsandColors()
 	storeFace();
 	storeHeadband();
 	storeSmile();
-	
+	storeLeftEye();
+	storeRightEye();
+	storeEyeBand();
+}
+
+//----------------------------------------------------------------------------
+
+void display(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindVertexArray(vao);
+	glUniform3fv(theta, 1, Theta);
+	glDrawArrays(GL_LINE_LOOP, 0, 1000);
+	glDrawArrays(GL_TRIANGLES, 1000, 6);
+	glDrawArrays(GL_LINES, 1006, 16);
+	glDrawArrays(GL_LINE_LOOP, 1022, 60);
+	glDrawArrays(GL_TRIANGLES, 1082, 90);
+	glDrawArrays(GL_TRIANGLES, 1172, 6);
+
+	glutSwapBuffers();
 }
 
 //----------------------------------------------------------------------------
@@ -184,20 +282,6 @@ void init()
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-}
-
-//----------------------------------------------------------------------------
-
-void display(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindVertexArray(vao);
-	glUniform3fv(theta, 1, Theta);
-	glDrawArrays(GL_LINE_LOOP, 0, NumVertices-24);
-	glDrawArrays(GL_TRIANGLES, NumVertices - 24, NumVertices-18);
-	glDrawArrays(GL_LINES, NumVertices - 18, NumVertices);
-
-	glutSwapBuffers();
 }
 
 //----------------------------------------------------------------------------
