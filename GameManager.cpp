@@ -17,9 +17,10 @@ int Mode = InitMode;
 //Sixth 6 for eye band
 const int NumVertices = 1178;
 
-const int n = 4;
+const int n = 6;
 bool firstRoll = false;
 GLfloat rotatingDegree = 0.0;
+GLfloat moveSpeed = 0.0f;
 
 GLfloat faceRadius = 0.4;
 GLfloat smileRadius = 0.3;
@@ -55,12 +56,12 @@ color4 vertex_colors[6] = {
 
 
 GLuint  theta;  // The location of the "theta" shader uniform variable
-GLuint translateOriginValue;
+GLuint translatebyRadiusValue;
 GLuint scale;
 
 GLfloat  ThetaValue[3] = { 0.0, 0.0, 0.0 };
-GLfloat  TranslateOriginValue[3] = { 0.0, 0.0, 0.0 };
 GLfloat  ScaleValue[3] = { 1.0, 1.0, 1.0 };
+GLfloat  TranslateByRadiusValue[3] = { 0.0, 0.0, 0.0 };
 //----------------------------------------------------------------------------
 
 int Index = 0;
@@ -243,7 +244,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vao);
 	glUniform3fv(theta, 1, ThetaValue);
-	glUniform3fv(translateOriginValue, 1, TranslateOriginValue);
+	glUniform3fv(translatebyRadiusValue, 1, TranslateByRadiusValue);
 	glUniform3fv(scale, 1, ScaleValue);
 
 	glDrawArrays(GL_LINE_LOOP, 0, 1000);
@@ -294,7 +295,7 @@ void init()
 		BUFFER_OFFSET(sizeof(points)));
 
 	theta = glGetUniformLocation(program, "theta");
-	translateOriginValue = glGetUniformLocation(program, "translateOriginValue");
+	translatebyRadiusValue = glGetUniformLocation(program, "translatebyRadiusValue");
 	scale = glGetUniformLocation(program, "scale");
 
 	glEnable(GL_DEPTH_TEST);
@@ -306,14 +307,9 @@ void animationMode(int id)
 {
 	if (Mode != AnimationMode) return;
 	rotatingDegree += 360.0 / n;
+	moveSpeed += faceRadius/2;
 	if (firstRoll) rotatingDegree = 0.0f;
 	if (rotatingDegree > 360) return;
-
-
-	//Move to (0,0)
-	TranslateOriginValue[0] = 0 - faceCenterPoint[0];
-	TranslateOriginValue[1] = 0 - faceCenterPoint[1];
-	TranslateOriginValue[2] = 0;
 
 	//Scale 1/2
 	ScaleValue[0] = 0.5f;
@@ -326,11 +322,13 @@ void animationMode(int id)
 	ThetaValue[2] = rotatingDegree * -1;
 
 	//Translate Left Screen
-
+	TranslateByRadiusValue[0] = moveSpeed;
+	TranslateByRadiusValue[1] = 0;
+	TranslateByRadiusValue[2] = 0;
 
 	firstRoll = false;
 	glutPostRedisplay();
-	glutTimerFunc(750, animationMode, 0);
+	glutTimerFunc(250, animationMode, 0);
 }
 
 
@@ -342,13 +340,20 @@ void keyboard(unsigned char key, int x, int y)
 		exit(EXIT_SUCCESS);
 		break;
 	case 'a': case 'A':
-		firstRoll = true;
-		rotatingDegree = 0;
-		Mode = AnimationMode;
+/*
+		faceRadius = 0.4;
+		smileRadius = 0.3;
+		eyeRadius = 0.05;
 		faceRadius *= 0.5f;
 		smileRadius *= 0.5f;
 		eyeRadius *= 0.5f;
-		glutTimerFunc(750, animationMode, 0);
+*/
+
+		firstRoll = true;
+		rotatingDegree = 0;
+		moveSpeed = -0.9;
+		Mode = AnimationMode;
+		glutTimerFunc(250, animationMode, 0);
 		break;
 	}
 	
@@ -413,7 +418,7 @@ int main(int argc, char **argv)
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
-	glutTimerFunc(750, animationMode, 0);
+	glutTimerFunc(250, animationMode, 0);
 
 	glutMainLoop();
 	return 0;

@@ -6,6 +6,7 @@ out vec4 color;
 
 uniform vec3 theta;
 uniform vec3 translateOriginValue;
+uniform vec3 translatebyRadiusValue;
 uniform vec3 scale;
 
 void main() 
@@ -35,7 +36,7 @@ void main()
     mat4 tXYZ = mat4(1.0, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
-		translateOriginValue.x, translateOriginValue.y, translateOriginValue.z, 1.0);
+		translatebyRadiusValue.x, translatebyRadiusValue.y, translatebyRadiusValue.z, 1.0);
 
     mat4 scaleXYZ = mat4(scale.x, 0.0, 0.0, 0.0,
 		0.0, scale.y, 0.0, 0.0,
@@ -43,5 +44,5 @@ void main()
 		0.0, 0.0, 0.0, 1.0);
      
     color = vColor;
-    gl_Position = rZ * rY * rX * scaleXYZ * tXYZ * vPosition;
+    gl_Position = tXYZ * rZ * rY * rX * scaleXYZ * vPosition;
 } 
