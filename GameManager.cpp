@@ -5,8 +5,15 @@ typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
 #define PI 3.14159265
-const int NumVertices = 90;
-GLfloat radius = 0.4;
+
+//First 60 for face
+//Second 6 for headband
+//Third 18 for smile
+const int NumVertices = 84;
+GLfloat faceRadius = 0.4;
+
+GLfloat smileRadius = 0.3;
+GLfloat eyeRadius = 0.1;
 
 point4 points[NumVertices];
 color4 colors[NumVertices];
@@ -16,11 +23,15 @@ GLuint wh = 500;
 
 GLuint vao;
 
-point4 PirateFace[30] = {
+//0-30 for face, 31-34 for headband, 35-43 for smile
+point4 PirateFace[45] = {
 	point4(0.0, 0.0 ,0.0, 1.0)
 };
 
-point4 centerPoint = point4(0.0, 0.0, 0.0, 1.0);
+point4 faceCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
+point4 smileCenterPoint = point4(0.0, 0.1, 0.0, 1.0);
+//point4 leftEyeCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
+//point4 rightEyeCenterPoint = point4(0.0, 0.0, 0.0, 1.0);
 
 // RGBA colors
 color4 vertex_colors[6] = {
@@ -38,39 +49,98 @@ GLuint  theta;  // The location of the "theta" shader uniform variable
 //----------------------------------------------------------------------------
 
 int Index = 0;
-void triangle(int a, int b)
+void lines(int a, int b)
 {
-	colors[Index] = vertex_colors[2]; points[Index] = PirateFace[a]; Index++;
-	colors[Index] = vertex_colors[2]; points[Index] = centerPoint; Index++;
-	colors[Index] = vertex_colors[2]; points[Index] = PirateFace[b]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[a]; Index++;
+	//colors[Index] = vertex_colors[2]; points[Index] = centerPoint; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[b]; Index++;
 }
 
+void quad(int a, int b, int c, int d)
+{
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[a]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[b]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[c]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[a]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[c]; Index++;
+	colors[Index] = vertex_colors[0]; points[Index] = PirateFace[d]; Index++;
+}
 //----------------------------------------------------------------------------
 
-void fillPointsandColors()
+void storeFace()
 {
 	GLfloat angle;
-	for(int i=0;i<=30; i++)
+	for (int i = 0; i <= 30; i++)
 	{
-		angle = 2 * PI * (i+1) / 30;
-		PirateFace[i].x = centerPoint.x + cos(angle) * radius;
-		PirateFace[i].y = centerPoint.y + sin(angle) * radius;	
-		PirateFace[i].z = 2.0; 
+		angle = 2 * PI * (i + 1) / 29;
+		PirateFace[i].x = faceCenterPoint.x + cos(angle) * faceRadius;
+		PirateFace[i].y = faceCenterPoint.y + sin(angle) * faceRadius;
+		PirateFace[i].z = 0.0;
+		PirateFace[i].w = 1.0;
 		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
 		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
 	}
 
-	for(int i=0;i<30;i++)
+	for (int i = 0; i < 30; i++)
 	{
-		triangle(i, i + 1);
+		lines(i, i + 1);
 	}
-/*
-	quad(1, 0, 3, 2);
-	quad(2, 3, 7, 6);
-	quad(3, 0, 4, 7);
-	quad(6, 5, 1, 2);
-	quad(4, 5, 6, 7);
-	quad(5, 4, 0, 1);*/
+
+}
+
+void storeHeadband()
+{
+	PirateFace[31].x = 0.32f;
+	PirateFace[31].y = 0.25f;
+	PirateFace[31].z = 0.0f;
+	PirateFace[31].w = 1.0f;
+
+	PirateFace[32].x = 0.32f;
+	PirateFace[32].y = 0.27f;
+	PirateFace[32].z = 0.0f;
+	PirateFace[32].w = 1.0f;
+
+	PirateFace[33].x = -0.32f;
+	PirateFace[33].y = 0.27f;
+	PirateFace[33].z = 0.0f;
+	PirateFace[33].w = 1.0f;
+
+	PirateFace[34].x = -0.32f;
+	PirateFace[34].y = 0.25f;
+	PirateFace[34].z = 0.0f;
+	PirateFace[34].w = 1.0f;
+
+	quad(31, 32, 33, 34);
+
+}
+
+void storeSmile()
+{
+	int counter = 35;
+	GLfloat angle;
+	for (int i = 17; i <= 25; i++)
+	{
+		angle = 2 * PI * (i + 1) / 29;
+		PirateFace[counter].x = smileCenterPoint.x + cos(angle) * smileRadius;
+		PirateFace[counter].y = smileCenterPoint.y + sin(angle) * smileRadius;
+		PirateFace[counter].z = 0.0;
+		PirateFace[counter++].w = 1.0;
+		//printf("Pressing left, respectively.X %f\n", PirateFace[i].x);
+		//printf("Pressing left, respectively.Y %f\n", PirateFace[i].y);
+	}
+
+	for (int i = 35; i <= 43; i++)
+	{
+		lines(i, i + 1);
+	}
+}
+
+void fillPointsandColors()
+{
+	storeFace();
+	storeHeadband();
+	storeSmile();
+	
 }
 
 //----------------------------------------------------------------------------
@@ -123,7 +193,9 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vao);
 	glUniform3fv(theta, 1, Theta);
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	glDrawArrays(GL_LINE_LOOP, 0, NumVertices-24);
+	glDrawArrays(GL_TRIANGLES, NumVertices - 24, NumVertices-18);
+	glDrawArrays(GL_LINES, NumVertices - 18, NumVertices);
 
 	glutSwapBuffers();
 }
